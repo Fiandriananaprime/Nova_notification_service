@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// NOTE: "notification" is its own microservice here. The OpenAPI/SQL schema
+// doesn't define a persisted notification/inbox table of its own (buyer and
+// seller notification *preferences* already live in the user service, since
+// they hang off User). This schema models the sending side: a durable log of
+// notifications dispatched to users, inferred from the *_notification_preferences
+// flags (order events, payment, promotions, low stock, payouts, etc.) and the
+// email/push/sms channels referenced throughout the SQL schema.
+//   - userId -> owned by the auth/user service, kept as a plain scalar Uuid
+//     field with no Prisma relation (no cross-service FK/join).
+// Flag this model to the team since it is inferred, not lifted 1:1 from the
+// provided schema.sql like the other services' models were.
+// ---------------------------------------------------------------------------
+
+enum NotificationChannel {
+  email
+  push
+  sms
+
+  @@map("notification_channel")
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  failed
+  read
+
+  @@map("notification_status")
+}
+
+model Notification {
+  id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  type        String
+  channel     NotificationChannel
+  title       String
+  body        String
+  metadata    Json                @default("{}")
+  status      NotificationStatus  @default(pending)
+  sentAt      DateTime?           @map("sent_at") @db.Timestamptz(6)
+  readAt      DateTime?           @map("read_at") @db.Timestamptz(6)
+  failureReason String?           @map("failure_reason")
+  createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_date")
+  @@index([status, createdAt(sort: Desc)], map: "idx_notifications_status_date")
+  @@index([type, createdAt(sort: Desc)], map: "idx_notifications_type_date")
+  @@map("notifications")
+}

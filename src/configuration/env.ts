@@ -11,7 +11,7 @@ const requiredEnv = (name: string): string => {
 }
 
 export const env = {
-  port: Number(process.env["PORT"] ?? 3000),
+  port: Number(process.env["PORT"]),
 
   rabbitmq: {
     url: requiredEnv("RABBITMQ_URL"),
@@ -27,7 +27,7 @@ export const env = {
   smtp: {
     host: requiredEnv("SMTP_HOST"),
     user: requiredEnv("SMTP_USER"),
-    port: Number(process.env["SMTP_PORT"] ?? 587),
+    port: Number(process.env["SMTP_PORT"]),
     password: requiredEnv("SMTP_PASSWORD"),
     from: requiredEnv("SMTP_FROM"),
   },

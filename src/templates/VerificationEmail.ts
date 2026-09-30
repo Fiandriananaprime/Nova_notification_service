@@ -1,6 +1,7 @@
 export function verificationEmailTemplate(
   code: string,
   expiresAt: string,
+  purpose: "email_verification" | "phone_verification" | "email_change" | "phone_change" | "sudo" = "email_verification",
 ) {
   const expiration = new Date(expiresAt).toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -8,6 +9,18 @@ export function verificationEmailTemplate(
   });
 
   const year = new Date().getFullYear();
+  const isSudo = purpose === "sudo";
+  const isEmailChange = purpose === "email_change";
+  const title = isSudo
+    ? "Confirm this security action"
+    : isEmailChange
+      ? "Confirm your new email"
+      : "Verify your email";
+  const description = isSudo
+    ? "Enter the code below to confirm this sensitive action on your NovaMarket account."
+    : isEmailChange
+      ? "Enter the code below to confirm your new email address."
+      : "Enter the verification code below to confirm your email address and continue with NovaMarket.";
 
   return `
 <!DOCTYPE html>
@@ -94,7 +107,7 @@ export function verificationEmailTemplate(
                 text-align: center;
                 color: #16262E;
               ">
-                Verify your email
+                ${title}
               </h1>
 
               <p style="
@@ -105,8 +118,7 @@ export function verificationEmailTemplate(
                 text-align: center;
                 color: #5d6d75;
               ">
-                Enter the verification code below to confirm
-                your email address and continue with NovaMarket.
+                ${description}
               </p>
 
               <!-- Code -->

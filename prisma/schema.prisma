@@ -40,8 +40,6 @@ enum NotificationStatus {
 
 model Notification {
   id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String              @map("user_id") @db.Uuid
-  type        String
   channel     NotificationChannel
   title       String
   body        String
@@ -52,8 +50,6 @@ model Notification {
   failureReason String?           @map("failure_reason")
   createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_date")
   @@index([status, createdAt(sort: Desc)], map: "idx_notifications_status_date")
-  @@index([type, createdAt(sort: Desc)], map: "idx_notifications_type_date")
   @@map("notifications")
 }

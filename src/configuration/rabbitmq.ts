@@ -13,6 +13,13 @@ export async function connectRabbitMQ() {
 
   channel = await connection.createChannel();
 
+  connection.on("error", (error) => {
+    console.error("RabbitMQ connection error", error);
+  });
+  connection.on("close", () => {
+    console.error("RabbitMQ connection closed; notification consumer is disconnected");
+  });
+
   await channel.assertExchange(
     env.rabbitmq.exchange,
     "topic",

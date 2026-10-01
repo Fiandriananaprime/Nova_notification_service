@@ -23,6 +23,7 @@ const smsService = new SmsService();
 const notificationService = new NotificationService(emailService,notificationRepository,smsService);
 const notificationConsumer = new NotificationConsumer(notificationService);
 
+await emailService.verifyConnection();
 await connectRabbitMQ();
 await notificationConsumer.start();
 registerHealth(app);
@@ -42,4 +43,3 @@ registerVersion(app, {
 registerMetrics(app);
 
 routes(app)
-

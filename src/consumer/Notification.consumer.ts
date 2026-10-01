@@ -48,7 +48,10 @@ export class NotificationConsumer {
           channel.ack(message);
 
         } catch (error) {
-
+          console.error("Failed to process notification event", {
+            queue,
+            error,
+          });
           channel.nack(
             message,
             false,

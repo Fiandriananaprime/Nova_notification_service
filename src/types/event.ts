@@ -6,7 +6,7 @@ export type AuthCodeRequestedEvent = {
     userId: string;
     target: string;
     channel?: "email" | "phone";
-    purpose?: "email_verification" | "phone_verification" | "email_change" | "phone_change" | "sudo";
+    purpose?: "email_verification" | "phone_verification" | "email_change" | "phone_change" | "reset_password" | "sudo";
     code: string;
     expiresAt: string;
   };

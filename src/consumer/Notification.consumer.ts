@@ -10,6 +10,7 @@ export class NotificationConsumer {
 
   async start() {
     const channel = getRabbitChannel();
+    await channel.prefetch(1);
 
     const consume = async (queue: string, queueChannel: "email" | "phone") => channel.consume(queue,
       async (message) => {
@@ -36,7 +37,8 @@ export class NotificationConsumer {
           }
 
           await this.notificationService.sendVerificationCode({
-                target:event.payload.target,
+                userId: event.payload.userId,
+                phoneNumber:event.payload.target,
                 channel:eventChannel,
                 purpose:event.payload.purpose ?? (eventChannel === "email"
                   ? "email_verification"
@@ -48,7 +50,10 @@ export class NotificationConsumer {
           channel.ack(message);
 
         } catch (error) {
-
+          console.error("Failed to process notification event", {
+            queue,
+            error,
+          });
           channel.nack(
             message,
             false,

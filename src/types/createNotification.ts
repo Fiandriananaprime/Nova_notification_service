@@ -1,6 +1,8 @@
 import type { Prisma } from "../generated/prisma/index.js"
 
 export type createNotication  = {
+    userId: string
+    type: string
     channel: NotificationChannel
     title:string
     body:string

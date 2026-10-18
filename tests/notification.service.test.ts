@@ -13,7 +13,7 @@ describe("NotificationService verification codes", () => {
     );
 
     await service.sendVerificationCode({
-      target: "user@example.com",
+      phoneNumber: "user@example.com",
       channel: "email",
       purpose: "sudo",
       code: "123456",
@@ -41,7 +41,7 @@ describe("NotificationService verification codes", () => {
     );
 
     await service.sendVerificationCode({
-      target: "+33123456789",
+      phoneNumber: "+33123456789",
       channel: "phone",
       purpose: "phone_verification",
       code: "654321",

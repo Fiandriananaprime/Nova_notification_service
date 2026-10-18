@@ -7,16 +7,7 @@ export const routes = (app: FastifyInstance, notificationService: NotificationSe
 
     app.register((route) => {
         route.get("/account/notifications", notificationController.getUserNotifications.bind(notificationController))
-        const markAsReadSchema = {
-            body: {
-                type: "object",
-                required: ["read"],
-                additionalProperties: false,
-                properties: { read: { type: "boolean", const: true } },
-            },
-        } as const;
-
-        route.patch("/account/notifications/:notificationId", { schema: markAsReadSchema }, notificationController.markNotificationAsRead.bind(notificationController));
-        route.patch("/account/notifications", { schema: markAsReadSchema }, notificationController.markAllNotificationsAsRead.bind(notificationController));
+        route.patch("/account/notifications/:notificationId", notificationController.markNotificationAsRead.bind(notificationController));
+        route.patch("/account/notifications", notificationController.markAllNotificationsAsRead.bind(notificationController));
      }, { prefix: "/api" });
 }

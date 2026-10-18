@@ -8,17 +8,8 @@ datasource db {
 }
 
 // ---------------------------------------------------------------------------
-// NOTE: "notification" is its own microservice here. The OpenAPI/SQL schema
-// doesn't define a persisted notification/inbox table of its own (buyer and
-// seller notification *preferences* already live in the user service, since
-// they hang off User). This schema models the sending side: a durable log of
-// notifications dispatched to users, inferred from the *_notification_preferences
-// flags (order events, payment, promotions, low stock, payouts, etc.) and the
-// email/push/sms channels referenced throughout the SQL schema.
-//   - userId -> owned by the auth/user service, kept as a plain scalar Uuid
-//     field with no Prisma relation (no cross-service FK/join).
-// Flag this model to the team since it is inferred, not lifted 1:1 from the
-// provided schema.sql like the other services' models were.
+// userId is kept as a scalar UUID; the notification service does not create
+// Prisma relations to users owned by another service.
 // ---------------------------------------------------------------------------
 
 enum NotificationChannel {
@@ -40,6 +31,8 @@ enum NotificationStatus {
 
 model Notification {
   id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  type        String
   channel     NotificationChannel
   title       String
   body        String
@@ -50,6 +43,8 @@ model Notification {
   failureReason String?           @map("failure_reason")
   createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
 
+  @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_date")
   @@index([status, createdAt(sort: Desc)], map: "idx_notifications_status_date")
+  @@index([type, createdAt(sort: Desc)], map: "idx_notifications_type_date")
   @@map("notifications")
 }

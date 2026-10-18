@@ -38,6 +38,7 @@ export class EmailService {
                 filename: "NovaSign.png",
                 path: this.logoPath,
                 cid: "novamarket-logo",
+                contentDisposition: "inline",
                 },
             ],
         })
